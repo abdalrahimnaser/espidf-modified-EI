@@ -15,7 +15,7 @@
 #include "multi_heap.h"
 #include "multi_heap_internal.h"
 
-#if !CONFIG_HEAP_TLSF_USE_ROM_IMPL
+#if !CONFIG_HEAP_TLSF_USE_ROM_IMPL && !CONFIG_CMPCT_MALLOC_HEAP
 #include "tlsf.h"
 #include "tlsf_block_functions.h"
 #endif
@@ -27,7 +27,7 @@
 /* Defines compile-time configuration macros */
 #include "multi_heap_config.h"
 
-#if (!defined MULTI_HEAP_POISONING)
+#if (!defined MULTI_HEAP_POISONING) && (!defined CONFIG_CMPCT_MALLOC_HEAP)
 
 void *multi_heap_aligned_alloc_offs(multi_heap_handle_t heap, size_t size, size_t alignment, size_t offset)
 {
@@ -69,8 +69,22 @@ size_t multi_heap_minimum_free_size(multi_heap_handle_t heap)
 void *multi_heap_get_block_address(multi_heap_block_handle_t block)
     __attribute__((alias("multi_heap_get_block_address_impl")));
 
+void multi_heap_set_option(multi_heap_handle_t heap, int option, void *value)
+{
+}
+
+void *multi_heap_get_option(int option)
+{
+    return NULL;
+}
+
+void multi_heap_iterate_tagged_memory_areas(multi_heap_handle_t heap, void *user_data, void *tag, tagged_memory_callback_t callback, uint32_t flags)
+{
+}
+
 #endif // !CONFIG_HEAP_TLSF_USE_ROM_IMPL
-#endif // !MULTI_HEAP_POISONING
+#endif // !MULTI_HEAP_POISONING && !CONFIG_CMPCT_MALLOC_HEAP
+
 
 #define ALIGN(X) ((X) & ~(sizeof(void *)-1))
 #define ALIGN_UP(X) ALIGN((X)+sizeof(void *)-1)
@@ -107,7 +121,7 @@ void multi_heap_in_rom_init(void)
     multi_heap_os_funcs_init(&multi_heap_os_funcs);
 }
 
-#else // CONFIG_HEAP_TLSF_USE_ROM_IMPL
+#elif !defined(CONFIG_CMPCT_MALLOC_HEAP)
 
 /* Check a block is valid for this heap. Used to verify parameters. */
 __attribute__((noinline)) NOCLONE_ATTR static void assert_valid_block(const heap_t *heap, const block_header_t *block)

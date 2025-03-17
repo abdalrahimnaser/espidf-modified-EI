@@ -74,5 +74,3 @@
 [submodule "components/bt/host/nimble/nimble"]
 	path = components/bt/host/nimble/nimble
 	url = https://github.com/abdalrahimnaser/espnimble-modified-EI.git
-	branch = temp_branch_name
-	ignore = untracked
